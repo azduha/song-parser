@@ -1,15 +1,39 @@
-import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
+import { forEver } from 'waitasecond';
+import { ParserManager } from './ParserManager';
+import { PisnickyAkordyParser } from './parsers/PisnickyAkordyParser';
 
 dotenv.config();
 
-const app: Express = express();
-const port = process.env.PORT;
+const parserManager = new ParserManager();
+parserManager.registerParser(new PisnickyAkordyParser());
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Express + TypeScript Server');
-});
+(async () => {
+    const url = 'https://pisnicky-akordy.cz/tomas-klus/az';
 
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at https://localhost:${port}`);
-});
+    const result = await parserManager.parse(new URL(url));
+    if (!result) {
+        console.error('No result');
+    } else {
+        console.log(`Name: ${result.title}`);
+        console.log(`Artist: ${result.artist}`);
+        console.log(`URL: ${result.url}`);
+        console.log('');
+        for (const section of result.sections) {
+            console.log(`> ${section.name}`);
+            for (const paragraph of section.content) {
+                for (const token of paragraph) {
+                    if (token.type === 'text') {
+                        process.stdout.write(token.value);
+                    } else {
+                        process.stdout.write(`[${token.value}]`);
+                    }
+                }
+                console.log('');
+            }
+            console.log('');
+        }
+    }
+
+    await forEver();
+})();
