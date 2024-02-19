@@ -43,10 +43,18 @@ export function parseAgama(content: string[]): Section[] {
             if (row.type === 'chords') {
                 const nextRow = section[i + 1];
                 if (nextRow && nextRow.type === 'text') {
-                    acc.push({
-                        lyrics: nextRow.value,
-                        chords: row.value,
-                    });
+                    const match = matchSectionName(row.value);
+                    if (match) {
+                        acc.push({
+                            lyrics: match![0] + nextRow.value,
+                            chords: ' '.repeat(match![0].length) + row.value.slice(match![0].length),
+                        });
+                    } else {
+                        acc.push({
+                            lyrics: nextRow.value,
+                            chords: row.value,
+                        });
+                    }
                 }
                 if (!nextRow || nextRow.type === 'chords') {
                     if (matchSectionName(row.value)) {

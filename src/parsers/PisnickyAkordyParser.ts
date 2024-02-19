@@ -29,7 +29,8 @@ export class PisnickyAkordyParser extends AbstractParser {
         const rows = rawRows
             .map((row) => row.text)
             .join('')
-            .split('\r\n');
+            .replaceAll('\r\n', '\n')
+            .split('\n');
 
         const sections = parseAgama(rows);
 
