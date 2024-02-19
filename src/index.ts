@@ -4,46 +4,34 @@ import { forEver } from 'waitasecond';
 import { ParserManager } from './ParserManager';
 import { PisnickyAkordyParser } from './parsers/PisnickyAkordyParser';
 import { SupermusicParser } from './parsers/SupermusicParser';
+import { VelkyZpevnikParser } from './parsers/VelkyZpevnikParser';
+import { ZpevnikWzParser } from './parsers/ZpevnikWzParser';
+import { songs } from './songs';
+import { xmlSerialize } from './xmlSerializer';
 
 dotenv.config();
 
 const parserManager = new ParserManager();
 parserManager.registerParser(new PisnickyAkordyParser());
 parserManager.registerParser(new SupermusicParser());
-
-const songs = [
-    'https://supermusic.cz/skupina.php?action=piesen&idpiesne=1118090',
-    'https://supermusic.cz/skupina.php?action=piesen&idpiesne=988665',
-    'https://supermusic.cz/skupina.php?idpiesne=351532',
-];
+parserManager.registerParser(new VelkyZpevnikParser());
+parserManager.registerParser(new ZpevnikWzParser());
 
 (async () => {
     for (const url of songs) {
         const result = await parserManager.parse(new URL(url));
-        let string = '';
+
         if (!result) {
             console.error('No result for ' + url);
         } else {
-            string += `Name: ${result.title}\n`;
-            string += `Artist: ${result.artist}\n`;
-            string += `URL: ${result.url}\n`;
-            string += '\n';
-            for (const section of result.sections) {
-                string += `> ${section.name}\n`;
-                for (const paragraph of section.content) {
-                    for (const token of paragraph) {
-                        if (token.type === 'text') {
-                            string += token.value;
-                        } else {
-                            string += `[${token.value}]`;
-                        }
-                    }
-                    string += '\n';
-                }
-                string += '\n';
-            }
+            const string = xmlSerialize(result);
 
-            fs.writeFileSync(`out/${result.title} (${result.artist}).txt`, string);
+            const filename = result.title
+                .normalize('NFKD')
+                .replace(/[^\w\s.-_\/]/g, '')
+                .replace(/[^a-z0-9]/gi, '_')
+                .toLowerCase();
+            fs.writeFileSync(`out/${filename}.xml`, string);
         }
     }
 

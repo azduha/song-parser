@@ -7,7 +7,7 @@ import { parseAgama } from './utils/parseAgama';
 export class PisnickyAkordyParser extends AbstractParser {
     public async parse(url: URL, options: ParserOptions): Promise<Song | null> {
         const hostname = url.hostname;
-        if (hostname !== 'pisnicky-akordy.cz') {
+        if (!hostname.includes('pisnicky-akordy.cz')) {
             return null;
         }
 

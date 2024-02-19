@@ -7,7 +7,7 @@ import { parseTxt } from './utils/parseTxt';
 export class SupermusicParser extends AbstractParser {
     public async parse(url: URL, options: ParserOptions): Promise<Song | null> {
         const hostname = url.hostname;
-        if (!hostname.startsWith('supermusic')) {
+        if (!hostname.includes('supermusic')) {
             return null;
         }
 
