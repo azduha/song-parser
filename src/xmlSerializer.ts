@@ -16,7 +16,7 @@ export function xmlSerialize(content: Song): string {
     // Song sections
     string += '    <sections>\n';
     for (const section of content.sections) {
-        string += `        <section${section.name && ` name="${section.name}"`}>\n`;
+        string += `        <section${section.name ? ` name="${section.name}"` : ''}>\n`;
         for (const row of section.content) {
             string += `            ${row
                 .map((token) => (token.type === 'text' ? token.value : `<chord value="${token.value}"/>`))

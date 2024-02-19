@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import fs from 'fs';
-import { forEver } from 'waitasecond';
 import { ParserManager } from './ParserManager';
 import { PisnickyAkordyParser } from './parsers/PisnickyAkordyParser';
 import { SupermusicParser } from './parsers/SupermusicParser';
@@ -36,5 +35,4 @@ parserManager.registerParser(new ZpevnikWzParser());
     }
 
     console.log('Done!');
-    await forEver();
 })();
